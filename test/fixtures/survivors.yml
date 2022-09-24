@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  age: 1
+  gender: MyString
+  latitude: 1.5
+  longitude: 1.5
+  water: 1
+  soup: 1
+  firstAid: 1
+  ak47: 1
+
+two:
+  name: MyString
+  age: 1
+  gender: MyString
+  latitude: 1.5
+  longitude: 1.5
+  water: 1
+  soup: 1
+  firstAid: 1
+  ak47: 1
