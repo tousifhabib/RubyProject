@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
-  namespace :api do
-    resources :survivor
+  namespace :api, defualts:{ format: :json } do
+    resources :survivor do
+      member do
+        put 'location'
+      end
+    end
   end
 end

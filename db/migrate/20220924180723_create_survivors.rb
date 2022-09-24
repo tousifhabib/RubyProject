@@ -10,6 +10,7 @@ class CreateSurvivors < ActiveRecord::Migration[7.0]
       t.integer :soup
       t.integer :firstAid
       t.integer :ak47
+      t.boolean :infected
 
       t.timestamps
     end
