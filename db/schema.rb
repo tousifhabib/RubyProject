@@ -15,16 +15,17 @@ ActiveRecord::Schema[7.0].define(version: 2022_09_24_180723) do
   enable_extension "plpgsql"
 
   create_table "survivors", force: :cascade do |t|
-    t.string "name"
-    t.integer "age"
-    t.string "gender"
-    t.float "latitude"
-    t.float "longitude"
-    t.integer "water"
-    t.integer "soup"
-    t.integer "firstAid"
-    t.integer "ak47"
-    t.boolean "infected"
+    t.string "name", null: false
+    t.integer "age", null: false
+    t.string "gender", null: false
+    t.float "latitude", null: false
+    t.float "longitude", null: false
+    t.integer "water", default: 0
+    t.integer "soup", default: 0
+    t.integer "firstAid", default: 0
+    t.integer "ak47", default: 0
+    t.integer "infectionCount", default: 0, null: false
+    t.boolean "infected", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

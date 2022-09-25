@@ -1,16 +1,17 @@
 class CreateSurvivors < ActiveRecord::Migration[7.0]
   def change
     create_table :survivors do |t|
-      t.string :name
-      t.integer :age
-      t.string :gender
-      t.float :latitude
-      t.float :longitude
-      t.integer :water
-      t.integer :soup
-      t.integer :firstAid
-      t.integer :ak47
-      t.boolean :infected
+      t.string :name, null: false
+      t.integer :age, null: false
+      t.string :gender, null: false
+      t.float :latitude, null: false
+      t.float :longitude, null: false
+      t.integer :water, :default => 0, null: true
+      t.integer :soup, :default => 0, null: true
+      t.integer :firstAid, :default => 0, null: true
+      t.integer :ak47, :default => 0, null: true
+      t.integer :infectionCount, :default => 0, null: false
+      t.boolean :infected, :default => false, null: false
 
       t.timestamps
     end
