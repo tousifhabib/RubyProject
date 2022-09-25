@@ -1,4 +1,3 @@
-
 class Api::SurvivorController < ApplicationController
 
     # GET /api/survivor
@@ -49,21 +48,69 @@ class Api::SurvivorController < ApplicationController
 
     # POST /api/survivor/trade
     def trade
-        buyerId = params[:trade][:buyerId]
-        sellerId = params[:trade][:sellerId]
+        tradeValues = {
+            water: 14,
+            soup: 12,
+            firstAid: 10,
+            ak47: 8,
+        }
 
-        itemsToBuy = params[:trade][:itemsToBuy]
-        itemsToSell = params[:trade][:itemsToSell]
+        buyer = Survivor.find(survivor_trade_params[:buyerId])
+        seller = Survivor.find(survivor_trade_params[:sellerId])
 
-        puts "REMOVE-ME #{itemsToSell}"
+        #puts "REMOVE-ME #{survivor_trade_params[:itemsToBuy]}"
+        #puts "REMOVE-ME #{tradeValues}"
+        #puts "REMOVE ME #{isInfected(buyer[:infected], seller[:infected])}"
+
+        if isInfected(buyer[:infected], seller[:infected]) == false
+            # Check if buyer and seller has items to trade
+            hasItems(buyer, seller, survivor_trade_params[:itemsToBuy], survivor_trade_params[:itemsToSell])
+
+        else
+            puts "IMPLEMENT REJECTION LOGIC"
+        end
 
     end
 
     private
+    
     def survivor_params
         params.require(:survivor).permit(:name, :age, :gender, :latitude, :longitude, :water, :soup, :firstAid, :ak47, :infected)
     end
+    
     def survivor_location_params
         params.require(:location).permit(:latitude, :longitude)
     end
+
+    def survivor_trade_params
+        params.require(:trade).permit(
+            :buyerId, 
+            :sellerId, 
+            itemsToBuy: [:water, :soup, :firstAid, :ak47], 
+            itemsToSell: [:water, :soup, :firstAid, :ak47])
+    end
+
+    def isInfected(buyerInfectionStatus, sellerInfectionStatus)
+        if buyerInfectionStatus == true || sellerInfectionStatus == true
+            return true
+        else
+            return false
+        end
+    end
+
+    def hasItems(buyer, seller, itemsToBuy, itemsToSell)
+        # Check if buyer has items to sell
+        buyerItemsToSell = buyer.slice(itemsToSell.keys)
+        sellerItemsToBuy = seller.slice(itemsToBuy.keys)
+
+        # if buyer
+        #     puts "URGAYHAHA!"
+        # end
+
+        puts "REMOVE-ME #{buyerItemsToSell}"
+        puts "REMOVE-ME #{sellerItemsToBuy}"
+        puts "REMOVE-ME #{buyerItemsToBuy}"
+        puts "REMOVE-ME #{sellerItemsToSell}"
+    end
+
 end
