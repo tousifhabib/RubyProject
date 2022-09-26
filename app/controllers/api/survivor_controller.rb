@@ -5,16 +5,16 @@ module Api
     # GET /api/survivor
     def index
       @survivors = Survivor.all
-      render json: { status: 'SUCCESS', message: 'List of survivors', data: @survivors }, status: :created
+      render json: { status: 'SUCCESS', message: 'List of survivors', data: @survivors }, status: :ok
     end
 
     # POST /api/survivor
     def create
       @survivor = Survivor.new(survivor_params)
       if @survivor.save
-        render json: @survivor
+        render json: { status: 'SUCCESS', message: 'Successfully created survivor', survivor: @survivor }, status: :created
       else
-        render error: { error: 'Unable to create a Survivor' }, status: 400
+        render error: { error: 'Unable to create a Survivor' }, status: :bad_request
       end
     end
 
@@ -69,12 +69,16 @@ module Api
       if isInfected(buyer[:infected], seller[:infected]) == false
         # Check if buyer and seller has items in their inventory to trade and checks if the number of items to be traded is valid
         if hasItems(buyer, seller, survivor_trade_params[:itemsToBuy], survivor_trade_params[:itemsToSell]) == true
-          if validTrade(buyer, seller, survivor_trade_params[:itemsToBuy], survivor_trade_params[:itemsToSell], tradeValues) != false
-            render json: { status: 'SUCCESS', message: 'Successfull Trade', buyerPoints: @buyerSum, sellerPoints: @sellerSum, buyerInventoryChange: @updatedBuyerInventory.merge(id: buyer[:id]), sellerInventoryChange: @updatedSellerInventory.merge(id: seller[:id]) },
+          if validTrade(buyer, seller, survivor_trade_params[:itemsToBuy], survivor_trade_params[:itemsToSell], tradeValues) == true
+            render json: { status: 'SUCCESS', message: 'Successful trade', buyerPoints: @buyerSum, sellerPoints: @sellerSum, buyerInventoryChange: @updatedBuyerInventory.merge(id: buyer[:id], name: buyer[:name]), sellerInventoryChange: @updatedSellerInventory.merge(id: seller[:id], name: seller[:name]) },
             status: :ok
+          else
+            render json: { status: 'ERROR', message: 'unsuccessful trade because buyer and seller points do not match', buyerPoints: @buyerSum, sellerPoints: @sellerSum},
+            status: :bad_request
           end
         else
-          puts 'FALSE'
+          render json: { status: 'ERROR', message: 'Unsuccessful trade because buyer or seller does not have so many items' },
+          status: :bad_request
         end
 
       else
@@ -85,8 +89,7 @@ module Api
     private
 
     def survivor_params
-      params.require(:survivor).permit(:name, :age, :gender, :latitude, :longitude, :water, :soup, :firstAid, :ak47,
-                                       :infected)
+      params.require(:survivor).permit(:name, :age, :gender, :latitude, :longitude, :water, :soup, :firstAid, :ak47)
     end
 
     def survivor_location_params
@@ -182,6 +185,7 @@ module Api
         # Updated DB records
         buyer.update(@updatedBuyerInventory)
         seller.update(@updatedSellerInventory)
+        return true
       else
         return false
       end
