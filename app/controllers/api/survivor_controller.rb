@@ -10,7 +10,6 @@ class Api::SurvivorController < ApplicationController
     def create
         @survivor = Survivor.new(survivor_params)
         if @survivor.save
-            puts 'REMOVE-ME CALLING SURVIVOR CREATE ENDPOINT'
             render json: @survivor
         else
             render error: { error: 'Unable to create a Survivor' }, status: 400
@@ -48,6 +47,7 @@ class Api::SurvivorController < ApplicationController
 
     # POST /api/survivor/trade
     def trade
+        # This hash has the number of points that each item is worth
         tradeValues = {
             "water" => 14,
             "soup" => 12,
@@ -57,10 +57,6 @@ class Api::SurvivorController < ApplicationController
 
         buyer = Survivor.find(survivor_trade_params[:buyerId])
         seller = Survivor.find(survivor_trade_params[:sellerId])
-
-        #puts "REMOVE-ME #{survivor_trade_params[:itemsToBuy]}"
-        #puts "REMOVE-ME #{tradeValues}"
-        #puts "REMOVE ME #{isInfected(buyer[:infected], seller[:infected])}"
 
         # Check if either the buyer or seller is infected
         if isInfected(buyer[:infected], seller[:infected]) == false
@@ -156,9 +152,12 @@ class Api::SurvivorController < ApplicationController
             sellerSum += sellerTradeValues.values[i] * itemsToBuy.values[i]
         end
 
+        # If the aggregate points for buyer and seller match, the DB record will be updated
         if buyerSum == sellerSum
-
+            
+            puts "HELLO!"
         else
+            puts "NO!"
             return false
         end
 
