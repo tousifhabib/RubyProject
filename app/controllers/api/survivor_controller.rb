@@ -49,10 +49,10 @@ class Api::SurvivorController < ApplicationController
     # POST /api/survivor/trade
     def trade
         tradeValues = {
-            water: 14,
-            soup: 12,
-            firstAid: 10,
-            ak47: 8,
+            "water" => 14,
+            "soup" => 12,
+            "firstAid" => 10,
+            "ak47" => 8
         }
 
         buyer = Survivor.find(survivor_trade_params[:buyerId])
@@ -62,9 +62,16 @@ class Api::SurvivorController < ApplicationController
         #puts "REMOVE-ME #{tradeValues}"
         #puts "REMOVE ME #{isInfected(buyer[:infected], seller[:infected])}"
 
+        # Check if either the buyer or seller is infected
         if isInfected(buyer[:infected], seller[:infected]) == false
-            # Check if buyer and seller has items to trade
-            hasItems(buyer, seller, survivor_trade_params[:itemsToBuy], survivor_trade_params[:itemsToSell])
+            # Check if buyer and seller has items in their inventory to trade and checks if the number of items to be traded is valid
+           if hasItems(buyer, seller, survivor_trade_params[:itemsToBuy], survivor_trade_params[:itemsToSell]) == true
+            if 
+                validTrade(buyer, seller, survivor_trade_params[:itemsToBuy], survivor_trade_params[:itemsToSell], tradeValues)
+            end
+           else
+            puts "FALSE"
+           end
 
         else
             puts "IMPLEMENT REJECTION LOGIC"
@@ -103,14 +110,67 @@ class Api::SurvivorController < ApplicationController
         buyerItemsToSell = buyer.slice(itemsToSell.keys)
         sellerItemsToBuy = seller.slice(itemsToBuy.keys)
 
-        # if buyer
-        #     puts "URGAYHAHA!"
-        # end
+        # puts "REMOVE-ME #{buyerItemsToSell}"
+        # puts "REMOVE-ME #{sellerItemsToBuy}"
+        # puts "REMOVE-ME #{itemsToBuy}"
+        # puts "REMOVE-ME #{itemsToSell}"
 
-        puts "REMOVE-ME #{buyerItemsToSell}"
-        puts "REMOVE-ME #{sellerItemsToBuy}"
-        puts "REMOVE-ME #{buyerItemsToBuy}"
-        puts "REMOVE-ME #{sellerItemsToSell}"
+        # Check if the correct number of items the buyer wants to sell exists in their inventory
+        buyerItemsToSell.values.each_index do |i|
+            if buyerItemsToSell.values[i] < itemsToSell.values[i]
+                # puts "REMOVE-ME FALSCH"
+                return false
+            end
+        end
+
+        # Check if the correct number of items the seller wants to buy exists in their inventory
+        sellerItemsToBuy.values.each_index do |i|
+            if sellerItemsToBuy.values[i] < itemsToBuy.values[i]
+                # puts "REMOVE-ME FALSCH"
+                return false
+            end
+        end
+
+        return true
+    end
+
+    def validTrade(buyer, seller, itemsToBuy, itemsToSell, tradeValues)
+        buyerItemsToSell = buyer.slice(itemsToSell.keys)
+        sellerItemsToBuy = seller.slice(itemsToBuy.keys)
+
+        # Only items that the buyer and seller respectively have will be extracted from the tradeValues hash
+        buyerTradeValues = tradeValues.select { |key, value| itemsToSell.include? key }
+        sellerTradeValues = tradeValues.select { |key, value| itemsToBuy.include? key }
+
+        # Calculate aggregate points of buyer
+        buyerSum = 0
+        sellerSum = 0
+
+        # Calculates aggregate points of what the buyer is offering
+        buyerTradeValues.values.each_index do |i|
+            buyerSum += buyerTradeValues.values[i] * itemsToSell.values[i]
+        end
+
+        # Calculates aggregate points of what the seller is offering
+        sellerTradeValues.values.each_index do |i|
+            sellerSum += sellerTradeValues.values[i] * itemsToBuy.values[i]
+        end
+
+        if buyerSum == sellerSum
+
+        else
+            return false
+        end
+
+        puts "REMOVE-ME #{buyerSum}"
+        puts "REMOVE-ME #{sellerSum}"
+
+        puts "REMOVE-ME #{tradeValues}"
+        puts "REMOVE-ME buyer trade values#{buyerTradeValues}"
+        puts "REMOVE-ME buyer items to sell#{buyerItemsToSell}"
+        puts "REMOVE-ME seller trade values#{sellerTradeValues}"
+        puts "REMOVE-ME seller itesm to sell#{sellerItemsToBuy}"
+
     end
 
 end
