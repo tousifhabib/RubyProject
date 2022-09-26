@@ -2,19 +2,34 @@
 
 module Api
   class SurvivorController < ApplicationController
+
     # GET /api/survivor
     def index
       @survivors = Survivor.all
       render json: { status: 'SUCCESS', message: 'List of survivors', data: @survivors }, status: :ok
     end
 
+    # GET /api/survivor/:id
+    def show
+      begin
+        survivor = Survivor.find(params[:id])
+        render json: { status: 'SUCCESS', message: 'Successfully found survivor record', survivor: survivor }, status: :ok
+      rescue => exception
+        render json: { status: 'ERROR', message: "Could not find survivor record with id: #{params[:id]}"}, status: :ok
+      end
+    end
+
     # POST /api/survivor
     def create
-      @survivor = Survivor.new(survivor_params)
-      if @survivor.save
-        render json: { status: 'SUCCESS', message: 'Successfully created survivor', survivor: @survivor }, status: :created
-      else
-        render error: { error: 'Unable to create a Survivor' }, status: :bad_request
+      begin
+        survivor = Survivor.new(survivor_params)
+        if survivor.save
+          render json: { status: 'SUCCESS', message: 'Successfully created survivor', survivor: survivor }, status: :created
+        else
+          render json: { status: 'ERROR', message: 'Input validation failed' }, status: :bad_request
+        end
+      rescue => exception
+        render json: { status: 'ERROR', message: 'Unable to create a Survivor' }, status: :bad_request
       end
     end
 
@@ -69,6 +84,7 @@ module Api
       if isInfected(buyer[:infected], seller[:infected]) == false
         # Check if buyer and seller has items in their inventory to trade and checks if the number of items to be traded is valid
         if hasItems(buyer, seller, survivor_trade_params[:itemsToBuy], survivor_trade_params[:itemsToSell]) == true
+          # Check if the trade is valid if the number of points are equal
           if validTrade(buyer, seller, survivor_trade_params[:itemsToBuy], survivor_trade_params[:itemsToSell], tradeValues) == true
             render json: { status: 'SUCCESS', message: 'Successful trade', buyerPoints: @buyerSum, sellerPoints: @sellerSum, buyerInventoryChange: @updatedBuyerInventory.merge(id: buyer[:id], name: buyer[:name]), sellerInventoryChange: @updatedSellerInventory.merge(id: seller[:id], name: seller[:name]) },
             status: :ok
@@ -131,7 +147,6 @@ module Api
           return false
         end
       end
-
       true
     end
 
@@ -169,23 +184,26 @@ module Api
       if @buyerSum == @sellerSum
 
         # Update inventory
+        if itemsToBuy != itemsToSell
+          # Items added to inventory
+          updatedBuyerInventoryAdded = Hash[buyerCurrentInventoryToBuy.map { |key, value| [key, value + itemsToBuy[key]] }]
+          updatedSellerInventoryAdded = Hash[sellerCurrentInventoryToSell.map { |key, value| [key, value + itemsToSell[key]] }]
+          
+          # Items removed from inventory
+          updatedBuyerInventorySold = Hash[buyerItemsAvailableToSell.map { |key, value| [key, value - itemsToSell[key]] }]
+          updatedSellerInventorySold = Hash[sellerItemsAvailableToBuy.map { |key, value| [key, value - itemsToBuy[key]] }]
 
-        # Items added to inventory
-        updatedBuyerInventoryAdded = Hash[buyerCurrentInventoryToBuy.map { |key, value| [key, value + itemsToBuy[key]] }]
-        updatedSellerInventoryAdded = Hash[sellerCurrentInventoryToSell.map { |key, value| [key, value + itemsToSell[key]] }]
-        
-        # Items removed from inventory
-        updatedBuyerInventorySold = Hash[buyerItemsAvailableToSell.map { |key, value| [key, value - itemsToSell[key]] }]
-        updatedSellerInventorySold = Hash[sellerItemsAvailableToBuy.map { |key, value| [key, value - itemsToBuy[key]] }]
+          # Updated inventory contents
+          @updatedBuyerInventory = updatedBuyerInventoryAdded.merge(updatedBuyerInventorySold)
+          @updatedSellerInventory = updatedSellerInventoryAdded.merge(updatedSellerInventorySold)
 
-        # Updated inventory contents
-        @updatedBuyerInventory = updatedBuyerInventoryAdded.merge(updatedBuyerInventorySold)
-        @updatedSellerInventory = updatedSellerInventoryAdded.merge(updatedSellerInventorySold)
-
-        # Updated DB records
-        buyer.update(@updatedBuyerInventory)
-        seller.update(@updatedSellerInventory)
-        return true
+          # Updated DB records
+          buyer.update(@updatedBuyerInventory)
+          seller.update(@updatedSellerInventory)
+          return true
+        else
+          return false
+        end
       else
         return false
       end
