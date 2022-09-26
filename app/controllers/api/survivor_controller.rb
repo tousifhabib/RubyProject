@@ -80,9 +80,9 @@ module Api
           render json: { status: 'ERROR', message: 'Unsuccessful trade because buyer or seller does not have so many items' },
           status: :bad_request
         end
-
       else
-        puts 'IMPLEMENT REJECTION LOGIC'
+        render json: { status: 'ERROR', message: 'Unsuccessful trade because buyer or seller is infected and their inventory is locked' },
+        status: :bad_request
       end
     end
 
