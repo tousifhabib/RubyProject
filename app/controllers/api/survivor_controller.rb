@@ -69,6 +69,10 @@ module Api
       if isInfected(buyer[:infected], seller[:infected]) == false
         # Check if buyer and seller has items in their inventory to trade and checks if the number of items to be traded is valid
         if hasItems(buyer, seller, survivor_trade_params[:itemsToBuy], survivor_trade_params[:itemsToSell]) == true
+          if validTrade(buyer, seller, survivor_trade_params[:itemsToBuy], survivor_trade_params[:itemsToSell], tradeValues) != false
+            render json: { status: 'SUCCESS', message: 'Successfull Trade', buyerPoints: @buyerSum, sellerPoints: @sellerSum, buyerInventoryChange: @updatedBuyerInventory.merge(id: buyer[:id]), sellerInventoryChange: @updatedSellerInventory.merge(id: seller[:id]) },
+            status: :ok
+          end
         else
           puts 'FALSE'
         end
@@ -108,26 +112,19 @@ module Api
 
     def hasItems(buyer, seller, itemsToBuy, itemsToSell)
       # Check if buyer has items to sell
-      buyerItemsToSell = buyer.slice(itemsToSell.keys)
-      sellerItemsToBuy = seller.slice(itemsToBuy.keys)
-
-      # puts "REMOVE-ME #{buyerItemsToSell}"
-      # puts "REMOVE-ME #{sellerItemsToBuy}"
-      # puts "REMOVE-ME #{itemsToBuy}"
-      # puts "REMOVE-ME #{itemsToSell}"
+      buyerItemsAvailableToSell = buyer.slice(itemsToSell.keys)
+      sellerItemsAvailableToBuy = seller.slice(itemsToBuy.keys)
 
       # Check if the correct number of items the buyer wants to sell exists in their inventory
-      buyerItemsToSell.values.each_index do |i|
-        if buyerItemsToSell.values[i] < itemsToSell.values[i]
-          # puts "REMOVE-ME FALSCH"
+      buyerItemsAvailableToSell.values.each_index do |i|
+        if buyerItemsAvailableToSell.values[i] < itemsToSell.values[i]
           return false
         end
       end
 
       # Check if the correct number of items the seller wants to buy exists in their inventory
-      sellerItemsToBuy.values.each_index do |i|
-        if sellerItemsToBuy.values[i] < itemsToBuy.values[i]
-          # puts "REMOVE-ME FALSCH"
+      sellerItemsAvailableToBuy.values.each_index do |i|
+        if sellerItemsAvailableToBuy.values[i] < itemsToBuy.values[i]
           return false
         end
       end
@@ -136,44 +133,58 @@ module Api
     end
 
     def validTrade(buyer, seller, itemsToBuy, itemsToSell, tradeValues)
-      buyerItemsToSell = buyer.slice(itemsToSell.keys)
-      sellerItemsToBuy = seller.slice(itemsToBuy.keys)
+      
+      # Total items that are available in the buyers and sellers inventory that will be transferred to the opposing party
+      buyerItemsAvailableToSell = buyer.slice(itemsToSell.keys)
+      sellerItemsAvailableToBuy = seller.slice(itemsToBuy.keys)
 
-      # Only items that the buyer and seller respectively have will be extracted from the tradeValues hash
+      buyerItemsAvailableToBuy = seller.slice(itemsToBuy.keys)
+      sellerItemsAvailableToSell = buyer.slice(itemsToSell.keys)
+
+      buyerCurrentInventoryToBuy = buyer.slice(itemsToBuy.keys)
+      sellerCurrentInventoryToSell = seller.slice(itemsToSell.keys)
+
+      # Only items that the buyer and seller want to trade have will be extracted from the tradeValues hash
       buyerTradeValues = tradeValues.select { |key, _value| itemsToSell.include? key }
       sellerTradeValues = tradeValues.select { |key, _value| itemsToBuy.include? key }
 
-      # Calculate aggregate points of buyer
-      buyerSum = 0
-      sellerSum = 0
+      # Aggregate points of buyer and seller
+      @buyerSum = 0
+      @sellerSum = 0
 
       # Calculates aggregate points of what the buyer is offering
       buyerTradeValues.values.each_index do |i|
-        buyerSum += buyerTradeValues.values[i] * itemsToSell.values[i]
+        @buyerSum += buyerTradeValues.values[i] * itemsToSell.values[i]
       end
 
       # Calculates aggregate points of what the seller is offering
       sellerTradeValues.values.each_index do |i|
-        sellerSum += sellerTradeValues.values[i] * itemsToBuy.values[i]
+        @sellerSum += sellerTradeValues.values[i] * itemsToBuy.values[i]
       end
 
       # If the aggregate points for buyer and seller match, the DB record will be updated
-      if buyerSum == sellerSum
+      if @buyerSum == @sellerSum
 
-        puts 'HELLO!'
+        # Update inventory
+
+        # Items added to inventory
+        updatedBuyerInventoryAdded = Hash[buyerCurrentInventoryToBuy.map { |key, value| [key, value + itemsToBuy[key]] }]
+        updatedSellerInventoryAdded = Hash[sellerCurrentInventoryToSell.map { |key, value| [key, value + itemsToSell[key]] }]
+        
+        # Items removed from inventory
+        updatedBuyerInventorySold = Hash[buyerItemsAvailableToSell.map { |key, value| [key, value - itemsToSell[key]] }]
+        updatedSellerInventorySold = Hash[sellerItemsAvailableToBuy.map { |key, value| [key, value - itemsToBuy[key]] }]
+
+        # Updated inventory contents
+        @updatedBuyerInventory = updatedBuyerInventoryAdded.merge(updatedBuyerInventorySold)
+        @updatedSellerInventory = updatedSellerInventoryAdded.merge(updatedSellerInventorySold)
+
+        # Updated DB records
+        buyer.update(@updatedBuyerInventory)
+        seller.update(@updatedSellerInventory)
       else
-        puts 'NO!'
         return false
       end
-
-      puts "REMOVE-ME #{buyerSum}"
-      puts "REMOVE-ME #{sellerSum}"
-
-      puts "REMOVE-ME #{tradeValues}"
-      puts "REMOVE-ME buyer trade values#{buyerTradeValues}"
-      puts "REMOVE-ME buyer items to sell#{buyerItemsToSell}"
-      puts "REMOVE-ME seller trade values#{sellerTradeValues}"
-      puts "REMOVE-ME seller itesm to sell#{sellerItemsToBuy}"
     end
   end
 end
