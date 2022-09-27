@@ -1,0 +1,194 @@
+---
+openapi: 3.0.1
+info:
+  title: API V1
+  version: v1
+paths:
+  "/api/reports/{id}/pointsLostFromSurvivor":
+    parameters:
+    - name: id
+      in: path
+      description: survivor id
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Gets total number of points lost due to infection from the inventory
+      responses:
+        '200':
+          description: Successfully calculated points lost because of an infected survivor
+        '400':
+          description: Survivor is not infected
+        '404':
+          description: Survivor resource cannot be found
+  "/api/reports/infectedSurvivors":
+    get:
+      summary: Gets the percentage of survivors that are infected
+      responses:
+        '200':
+          description: successful
+  "/api/reports/uninfectedSurvivors":
+    get:
+      summary: Gets the percentage of survivors that are not infected
+      responses:
+        '200':
+          description: successful
+  "/api/reports/averageResources":
+    get:
+      summary: Gets the average amount of resources that are available among survivors that are not infected
+      responses:
+        '200':
+          description: successful
+  "/api/reports":
+    get:
+      summary: Gets the aggregate report of number of infected and uninfected survivors, average inventory of all remaining survivors and total points lost due to infection
+      responses:
+        '200':
+          description: successful
+        '400': 
+          description: unprocessable entity
+  "/api/survivor/{id}/location":
+    parameters:
+    - name: id
+      in: path
+      description: survivor id
+      required: true
+      schema:
+        type: number
+    put:
+      summary: Update location of survivor by id
+      responses:
+        '200':
+          description: successful
+        '422':
+          description: unprocessable entity, unable to update Survivor location
+  "/api/survivor/{id}/infected":
+    parameters:
+    - name: id
+      in: path
+      description: survivor id
+      required: true
+      schema:
+        type: number
+    put:
+      summary: Update the infection count of a survivor and if it is greater than or equal to 5 the survivor is flagged as infected
+      responses:
+        '200':
+          description: successful, survivor is flagged as infected / not infected yet
+        '422':
+          description: unprocessable entity, cannot update survivor infection count
+  "/api/survivor/trade":
+    post:
+      summary: Trade items of equal value between two survivors that are not infected. Same items cannot be traded (for example ak 47 for ak 47)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - buyerId
+                - sellerId
+              properties:
+                trade:
+                  properties:
+                    buyerId:
+                      type: integer
+                    sellerId:
+                      type: integer
+                    itemsToBuy:
+                      properties:
+                        water:
+                          type: integer
+                        soup:
+                          type: integer
+                        firstAid:
+                          type: integer
+                        ak47:
+                          type: integer
+                    itemsToSell:
+                      properties:
+                        water:
+                          type: integer
+                        soup:
+                          type: integer
+                        firstAid:
+                          type: integer
+                        ak47:
+                          type: integer
+
+      responses:
+        '200':
+          description: successful trade
+        '400':
+          description: Unsuccessful trade because buyer or seller does not have so many items / is infected and their inventory is locked
+  "/api/survivor":
+    get:
+      summary: Lists survivors
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: Create a survivor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - age
+                - gender
+                - latitude
+                - longitude
+              properties:
+                survivor:
+                  properties:
+                    name:
+                      type: string
+                    age:
+                      type: integer
+                    gender:
+                      type: string
+                    latitude:
+                      type: number
+                    longitude:
+                      type: number
+                    water:
+                      type: integer
+                    soup:
+                      type: integer
+                    firstAid:
+                      type: integer
+                    ak47:
+                      type: integer 
+      responses:
+        '200':
+          description: successful
+        '400':
+          description: bad request, input validation failed
+        '422':
+          description: unprocessable entity, survivor record cannot be created
+  "/api/survivor/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: survivor id
+      required: true
+      schema:
+        type: number
+    get:
+      summary: Get survivor by id
+      responses:
+        '200':
+          description: successful
+        '404':
+          description: Survivor cannot be found
+          
+
+servers:
+- url: https://{defaultHost}
+  variables:
+    defaultHost:
+      default: www.example.com

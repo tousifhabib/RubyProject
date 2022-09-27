@@ -27,8 +27,8 @@ module Api
       else
         render json: { status: 'ERROR', message: 'Input validation failed' }, status: :bad_request
       end
-    rescue StandardError => e
-      render json: { status: 'ERROR', message: 'Unable to create a Survivor' }, status: :bad_request
+      rescue StandardError => e
+      render json: { status: 'ERROR', message: 'Unable to create a Survivor' }, status: :unprocessable_entity
     end
 
     # PUT /api/survivor/:id/location
