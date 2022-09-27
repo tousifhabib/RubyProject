@@ -38,7 +38,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:3000/api/survivor/7",
+							"raw": "http://127.0.0.1:3000/api/survivor/1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -50,7 +50,7 @@
 							"path": [
 								"api",
 								"survivor",
-								"7"
+								"1"
 							]
 						}
 					},
@@ -63,7 +63,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"survivor\": {\r\n            \"name\": \"FatherLess\",\r\n            \"age\": 23,\r\n            \"gender\": \"other\",\r\n            \"latitude\": 4444.21,\r\n            \"longitude\": 4444.32,\r\n            \"water\": 2,\r\n            \"soup\": 0,\r\n            \"firstAid\": 0,\r\n            \"ak47\": 0\r\n        }\r\n}",
+							"raw": "{\r\n    \"survivor\": {\r\n            \"name\": \"Tousif Habib\",\r\n            \"age\": 22,\r\n            \"gender\": \"male\",\r\n            \"latitude\": 4444.21,\r\n            \"longitude\": 4444.12,\r\n            \"water\": 20,\r\n            \"soup\": 20,\r\n            \"firstAid\": 20,\r\n            \"ak47\": 20\r\n        }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -95,7 +95,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"location\":{\r\n        \"latitude\": \"lol\",\r\n        \"longitude\": 44\r\n    }\r\n}",
+							"raw": "{\r\n    \"location\":{\r\n        \"latitude\": 30,\r\n        \"longitude\": 35\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -137,7 +137,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:3000/api/survivor/3/infected",
+							"raw": "http://127.0.0.1:3000/api/survivor/6/infected",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -149,7 +149,7 @@
 							"path": [
 								"api",
 								"survivor",
-								"3",
+								"6",
 								"infected"
 							]
 						}
@@ -163,7 +163,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"trade\":{\r\n        \"buyerId\":15,\r\n        \"sellerId\":16,\r\n        \"itemsToBuy\":{\r\n            \"water\": 5,\r\n            \"firstAid\": 5\r\n        },\r\n        \"itemsToSell\":{\r\n            \"ak47\": 7,\r\n            \"soup\": 6\r\n        }\r\n    }\r\n}",
+							"raw": "{\r\n    \"trade\":{\r\n        \"buyerId\":4,\r\n        \"sellerId\":6,\r\n        \"itemsToBuy\":{\r\n            \"water\": 5,\r\n            \"firstAid\": 5\r\n        },\r\n        \"itemsToSell\":{\r\n            \"ak47\": 6,\r\n            \"soup\": 6\r\n        }\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -224,7 +224,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:3000/api/reports/averageResources",
+							"raw": "http://127.0.0.1:3000/api/reports/uninfectedSurvivors",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -236,7 +236,7 @@
 							"path": [
 								"api",
 								"reports",
-								"averageResources"
+								"uninfectedSurvivors"
 							]
 						}
 					},
@@ -272,7 +272,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:3000/api/reports/4/pointsLostFromSurvivor",
+							"raw": "http://127.0.0.1:3000/api/reports/5/pointsLostFromSurvivor",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -284,7 +284,7 @@
 							"path": [
 								"api",
 								"reports",
-								"4",
+								"5",
 								"pointsLostFromSurvivor"
 							]
 						}
@@ -297,7 +297,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:3000/api/reports/4/pointsLostFromSurvivor",
+							"raw": "http://127.0.0.1:3000/api/reports",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -308,9 +308,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"reports",
-								"4",
-								"pointsLostFromSurvivor"
+								"reports"
 							]
 						}
 					},
