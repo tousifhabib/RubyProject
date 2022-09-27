@@ -1,0 +1,322 @@
+{
+	"info": {
+		"_postman_id": "8d0dee20-c29c-45a1-8996-85286e1e1487",
+		"name": "Zombie SNS endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13394055"
+	},
+	"item": [
+		{
+			"name": "Survivor Endpoints",
+			"item": [
+				{
+					"name": "Get survivor list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/survivor",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"survivor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a single survivor",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/survivor/7",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"survivor",
+								"7"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Survivor",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"survivor\": {\r\n            \"name\": \"FatherLess\",\r\n            \"age\": 23,\r\n            \"gender\": \"other\",\r\n            \"latitude\": 4444.21,\r\n            \"longitude\": 4444.32,\r\n            \"water\": 2,\r\n            \"soup\": 0,\r\n            \"firstAid\": 0,\r\n            \"ak47\": 0\r\n        }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/survivor",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"survivor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update location of Survivor",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"location\":{\r\n        \"latitude\": \"lol\",\r\n        \"longitude\": 44\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/survivor/1/location",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"survivor",
+								"1",
+								"location"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Infection of survivor",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/survivor/3/infected",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"survivor",
+								"3",
+								"infected"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Trade",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"trade\":{\r\n        \"buyerId\":15,\r\n        \"sellerId\":16,\r\n        \"itemsToBuy\":{\r\n            \"water\": 5,\r\n            \"firstAid\": 5\r\n        },\r\n        \"itemsToSell\":{\r\n            \"ak47\": 7,\r\n            \"soup\": 6\r\n        }\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/survivor/trade",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"survivor",
+								"trade"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Report Endpoints",
+			"item": [
+				{
+					"name": "Get infected survivors percentage",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/reports/infectedSurvivors",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"reports",
+								"infectedSurvivors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get uninfected survivors percentage",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/reports/averageResources",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"reports",
+								"averageResources"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get average amount of resources of survivors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/reports/averageResources",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"reports",
+								"averageResources"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get points lost from survivor",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/reports/4/pointsLostFromSurvivor",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"reports",
+								"4",
+								"pointsLostFromSurvivor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Total report",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/reports/4/pointsLostFromSurvivor",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"reports",
+								"4",
+								"pointsLostFromSurvivor"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

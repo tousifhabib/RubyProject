@@ -37,8 +37,11 @@ module Api
     # GET /api/reports/:id/pointsLostFromSurvivor
     def pointsLostFromSurvivor
       totalPointsLost = pointsLostFromInfectedSurvivor(params[:id])
-      render json: { status: 'SUCCESS', message: 'Successfully calculated points lost because of an infected survivor', pointsLost: totalPointsLost },
-             status: :ok
+
+      if totalPointsLost != false
+        render json: { status: 'SUCCESS', message: 'Successfully calculated points lost because of an infected survivor', pointsLost: totalPointsLost },
+        status: :ok
+      end
     end
 
     private
@@ -102,17 +105,19 @@ module Api
               sumPointsLost += survivorInventory.values[i] * tradeValues.values[i]
             end
 
-            sumPointsLost
+            return sumPointsLost
           else
             raise Exception 'Survivor is not infected'
           end
         rescue StandardError => e
           render json: { status: 'ERROR', message: 'Survivor is not infected' },
                  status: :bad_request
+          return false
         end
       rescue StandardError => e
         render json: { status: 'ERROR', message: 'Survivor with this Id cannot be found' },
                status: :not_found
+        return false
       end
     end
 
