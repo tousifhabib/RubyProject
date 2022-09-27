@@ -2,35 +2,33 @@
 
 module Api
   class SurvivorController < ApplicationController
-
     # GET /api/survivor
     def index
-      @survivors = Survivor.all
-      render json: { status: 'SUCCESS', message: 'List of survivors', data: @survivors }, status: :ok
+      survivors = Survivor.all
+      render json: { status: 'SUCCESS', message: 'List of survivors', data: survivors }, status: :ok
     end
 
     # GET /api/survivor/:id
     def show
-      begin
-        survivor = Survivor.find(params[:id])
-        render json: { status: 'SUCCESS', message: 'Successfully found survivor record', survivor: survivor }, status: :ok
-      rescue => exception
-        render json: { status: 'ERROR', message: "Could not find survivor record with id: #{params[:id]}"}, status: :ok
-      end
+      survivor = Survivor.find(params[:id])
+      render json: { status: 'SUCCESS', message: 'Successfully found survivor record', survivor: },
+             status: :ok
+    rescue StandardError => e
+      render json: { status: 'ERROR', message: "Could not find survivor record with id: #{params[:id]}" },
+             status: :not_found
     end
 
     # POST /api/survivor
     def create
-      begin
-        survivor = Survivor.new(survivor_params)
-        if survivor.save
-          render json: { status: 'SUCCESS', message: 'Successfully created survivor', survivor: survivor }, status: :created
-        else
-          render json: { status: 'ERROR', message: 'Input validation failed' }, status: :bad_request
-        end
-      rescue => exception
-        render json: { status: 'ERROR', message: 'Unable to create a Survivor' }, status: :bad_request
+      survivor = Survivor.new(survivor_params)
+      if survivor.save
+        render json: { status: 'SUCCESS', message: 'Successfully created survivor', survivor: },
+               status: :created
+      else
+        render json: { status: 'ERROR', message: 'Input validation failed' }, status: :bad_request
       end
+    rescue StandardError => e
+      render json: { status: 'ERROR', message: 'Unable to create a Survivor' }, status: :bad_request
     end
 
     # PUT /api/survivor/:id/location
@@ -85,20 +83,21 @@ module Api
         # Check if buyer and seller has items in their inventory to trade and checks if the number of items to be traded is valid
         if hasItems(buyer, seller, survivor_trade_params[:itemsToBuy], survivor_trade_params[:itemsToSell]) == true
           # Check if the trade is valid if the number of points are equal
-          if validTrade(buyer, seller, survivor_trade_params[:itemsToBuy], survivor_trade_params[:itemsToSell], tradeValues) == true
+          if validTrade(buyer, seller, survivor_trade_params[:itemsToBuy], survivor_trade_params[:itemsToSell],
+                        tradeValues) == true
             render json: { status: 'SUCCESS', message: 'Successful trade', buyerPoints: @buyerSum, sellerPoints: @sellerSum, buyerInventoryChange: @updatedBuyerInventory.merge(id: buyer[:id], name: buyer[:name]), sellerInventoryChange: @updatedSellerInventory.merge(id: seller[:id], name: seller[:name]) },
-            status: :ok
+                   status: :ok
           else
-            render json: { status: 'ERROR', message: 'unsuccessful trade because buyer and seller points do not match', buyerPoints: @buyerSum, sellerPoints: @sellerSum},
-            status: :bad_request
+            render json: { status: 'ERROR', message: 'unsuccessful trade because buyer and seller points do not match', buyerPoints: @buyerSum, sellerPoints: @sellerSum },
+                   status: :bad_request
           end
         else
           render json: { status: 'ERROR', message: 'Unsuccessful trade because buyer or seller does not have so many items' },
-          status: :bad_request
+                 status: :bad_request
         end
       else
         render json: { status: 'ERROR', message: 'Unsuccessful trade because buyer or seller is infected and their inventory is locked' },
-        status: :bad_request
+               status: :bad_request
       end
     end
 
@@ -136,22 +135,17 @@ module Api
 
       # Check if the correct number of items the buyer wants to sell exists in their inventory
       buyerItemsAvailableToSell.values.each_index do |i|
-        if buyerItemsAvailableToSell.values[i] < itemsToSell.values[i]
-          return false
-        end
+        return false if buyerItemsAvailableToSell.values[i] < itemsToSell.values[i]
       end
 
       # Check if the correct number of items the seller wants to buy exists in their inventory
       sellerItemsAvailableToBuy.values.each_index do |i|
-        if sellerItemsAvailableToBuy.values[i] < itemsToBuy.values[i]
-          return false
-        end
+        return false if sellerItemsAvailableToBuy.values[i] < itemsToBuy.values[i]
       end
       true
     end
 
     def validTrade(buyer, seller, itemsToBuy, itemsToSell, tradeValues)
-      
       # Total items that are available in the buyers and sellers inventory that will be transferred to the opposing party
       buyerItemsAvailableToSell = buyer.slice(itemsToSell.keys)
       sellerItemsAvailableToBuy = seller.slice(itemsToBuy.keys)
@@ -186,12 +180,20 @@ module Api
         # Update inventory
         if itemsToBuy != itemsToSell
           # Items added to inventory
-          updatedBuyerInventoryAdded = Hash[buyerCurrentInventoryToBuy.map { |key, value| [key, value + itemsToBuy[key]] }]
-          updatedSellerInventoryAdded = Hash[sellerCurrentInventoryToSell.map { |key, value| [key, value + itemsToSell[key]] }]
-          
+          updatedBuyerInventoryAdded = Hash[buyerCurrentInventoryToBuy.map do |key, value|
+                                              [key, value + itemsToBuy[key]]
+                                            end]
+          updatedSellerInventoryAdded = Hash[sellerCurrentInventoryToSell.map do |key, value|
+                                               [key, value + itemsToSell[key]]
+                                             end]
+
           # Items removed from inventory
-          updatedBuyerInventorySold = Hash[buyerItemsAvailableToSell.map { |key, value| [key, value - itemsToSell[key]] }]
-          updatedSellerInventorySold = Hash[sellerItemsAvailableToBuy.map { |key, value| [key, value - itemsToBuy[key]] }]
+          updatedBuyerInventorySold = Hash[buyerItemsAvailableToSell.map do |key, value|
+                                             [key, value - itemsToSell[key]]
+                                           end]
+          updatedSellerInventorySold = Hash[sellerItemsAvailableToBuy.map do |key, value|
+                                              [key, value - itemsToBuy[key]]
+                                            end]
 
           # Updated inventory contents
           @updatedBuyerInventory = updatedBuyerInventoryAdded.merge(updatedBuyerInventorySold)
@@ -200,12 +202,12 @@ module Api
           # Updated DB records
           buyer.update(@updatedBuyerInventory)
           seller.update(@updatedSellerInventory)
-          return true
+          true
         else
-          return false
+          false
         end
       else
-        return false
+        false
       end
     end
   end

@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
-  namespace :api, defualts:{ format: :json } do
-    
+  namespace :api, defualts: { format: :json } do
     resources :survivor do
       member do
         put 'location'
@@ -8,6 +7,16 @@ Rails.application.routes.draw do
       end
       collection do
         post 'trade'
+      end
+    end
+    resources :reports do
+      member do
+        get  'pointsLostFromSurvivor'
+      end
+      collection do
+        get 'infectedSurvivors'
+        get 'uninfectedSurvivors'
+        get 'averageResources'
       end
     end
   end
